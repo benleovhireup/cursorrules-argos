@@ -3,11 +3,20 @@ alwaysApply: true
 ---
 
 - Plan and prompt me before making any changes.
-- App is within `./web-apps/`, start with `npm run start`. Tests use jest, use `fnm use` to switch to the correct node version.
+- App is within `./web-apps/`, start with `npm run start`. 
 - Add all new labels to the en.json file
 - Order attributes alphabetically 
 
-Linting:
+## Tests
+
+Tests use jest, use `fnm use` to switch to the correct node version. 
+
+Example:
+```sh
+npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "validateHasRepeatEndDate" --coverage false
+```
+
+## Linting
 
 - Trailing spaces not allowed
 - '||' should be placed at the beginning of the line  
