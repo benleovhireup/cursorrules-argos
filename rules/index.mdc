@@ -15,7 +15,7 @@ alwaysApply: true
 Example:
 
 ```sh
-npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "validateRepeatEndDate" --coverage false
+npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "validateRepeatEndDate" --verbose --no-coverage
 ```
 
 ## Linting
