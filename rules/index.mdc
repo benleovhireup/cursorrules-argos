@@ -3,9 +3,9 @@ alwaysApply: true
 ---
 
 - Plan and prompt me before making any changes.
-- App is start within `./web-apps/` with `npm run start`. Tests use jest.
+- App is within `./web-apps/`, start with `npm run start`. Tests use jest, use `fnm use` to switch to the correct node version.
 - Add all new labels to the en.json file
-
+- Order attributes alphabetically 
 
 Linting:
 
