@@ -9,11 +9,13 @@ alwaysApply: true
 
 ## Tests
 
-Tests use jest, use `fnm use` to switch to the correct node version. 
+- Tests use jest, use `fnm use` to switch to the correct node version. 
+- Disable coverage to limit output.
 
 Example:
+
 ```sh
-npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "validateHasRepeatEndDate" --coverage false
+npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "validateRepeatEndDate" --coverage false
 ```
 
 ## Linting
