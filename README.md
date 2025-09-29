@@ -3,7 +3,7 @@
 Clone to the `.cursor/` directory.
 
 ```bash
-# in core project directory:
+# in argos project directory:
 git clone git@github.com:benleovhireup/cursorrules-argos.git .cursor
 ```
 

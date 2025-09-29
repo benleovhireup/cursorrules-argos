@@ -2,3 +2,14 @@
 alwaysApply: true
 ---
 
+- Plan and prompt me before making any changes.
+- App is start within `./web-apps/` with `npm run start`. Tests use jest.
+- Add all new labels to the en.json file
+
+
+Linting:
+
+- Trailing spaces not allowed
+- '||' should be placed at the beginning of the line  
+- Missing trailing comma
+- No unused variables

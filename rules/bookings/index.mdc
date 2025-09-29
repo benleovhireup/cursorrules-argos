@@ -1,0 +1,17 @@
+---
+alwaysApply: false
+description: Bookings, booking requests
+---
+
+## Booking requests
+
+- Routes: `web-apps/src/booking-requests/router/routes.js`
+
+### New - Multiple / client requesting one to many workers
+
+URL: `/booking-requests/create/attendant-care/location`
+
+### New - Direct / client requesting one worker
+
+URL: `/booking-requests/create/attendant-care/location?supportWorkerId=xxxx`
+
