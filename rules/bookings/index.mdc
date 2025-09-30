@@ -3,15 +3,39 @@ alwaysApply: false
 description: Bookings, booking requests
 ---
 
-## Booking requests
+# Booking requests
 
-- Routes: `web-apps/src/booking-requests/router/routes.js`
+Routes: `web-apps/src/booking-requests/router/routes.js`
 
-### New - Multiple / client requesting one to many workers
 
-URL: `/booking-requests/create/attendant-care/location`
+## Urls
 
-### New - Direct / client requesting one worker
+### Attendant care client direct/single request flow
 
-URL: `/booking-requests/create/attendant-care/location?supportWorkerId=xxxx`
+```
+booking-requests/create/attendant-care/location?supportWorkerId=xxxx
+```
 
+### Attendant care client team/multiple request flow 
+
+```
+booking-requests/create/attendant-care/location
+```
+
+### Provider direct/single worker request flow (not implemented yet) 
+
+```
+booking-requests/create/provider/location?supportWorkerId=xxxx 
+```
+
+### Provider team request flow (not implemented yet)
+
+```
+booking-requests/create/provider/location
+```
+
+#### Edit
+
+```
+/booking-requests/edit/attendant-care/multiple-workers/{{bookingRequestId}}/location
+```
