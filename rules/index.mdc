@@ -24,3 +24,4 @@ npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "
 - '||' should be placed at the beginning of the line  
 - Missing trailing comma
 - No unused variables
+- Always warp if with brackets even when there is only one line
