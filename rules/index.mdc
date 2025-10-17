@@ -24,4 +24,11 @@ npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "
 - '||' should be placed at the beginning of the line  
 - Missing trailing comma
 - No unused variables
-- Always warp if with brackets even when there is only one line
+- Always wrap if statements with brackets even when there is only one line
+
+## EN files
+- Never use hardcoded strings directly in Vue templates
+- All user-facing text in templates must reference constants from EN.json files
+
+## Constants
+- URL constants are usually stored in `web-apps/src/constants/urls.js`
