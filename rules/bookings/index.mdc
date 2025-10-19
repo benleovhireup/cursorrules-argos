@@ -6,7 +6,7 @@ description: Bookings, booking requests
 # Booking requests
 
 Routes: `web-apps/src/booking-requests/router/routes.js`
-
+Route guards: `web-apps/src/booking-requests/router/guards.js`
 
 ## Urls
 
