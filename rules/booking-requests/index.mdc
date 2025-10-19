@@ -1,0 +1,5 @@
+---
+alwaysApply: false
+---
+## Constants
+- The steps are configured in this file `web-apps/src/booking-requests/constants.js`

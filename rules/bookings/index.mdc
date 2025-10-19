@@ -10,6 +10,11 @@ Routes: `web-apps/src/booking-requests/router/routes.js`
 
 ## Urls
 
+### Attendant care client create completed booking flow
+```
+booking-requests/create/retrospective/attendant-care/
+```
+
 ### Attendant care client direct/single request flow
 
 ```
@@ -20,6 +25,11 @@ booking-requests/create/attendant-care/location?supportWorkerId=xxxx
 
 ```
 booking-requests/create/attendant-care/location
+```
+
+### Provider create completed booking flow
+```
+booking-requests/create/retrospective/provider/
 ```
 
 ### Provider direct/single worker request flow (not implemented yet) 
