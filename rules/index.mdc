@@ -8,6 +8,7 @@ alwaysApply: true
 - Order attributes alphabetically 
 - Use date-fns for date/time manipulation
 - Practice DRY (Dont repeat yourself)
+- Verify there isnt existing functionality that could be reused before writing new code
 
 ## Tests
 
