@@ -6,6 +6,7 @@ alwaysApply: true
 - App is within `./web-apps/`, start with `npm run start`. 
 - Add all new labels to the en.json file
 - Order attributes alphabetically 
+- Use date-fns for date/time manipulation
 
 ## Tests
 
