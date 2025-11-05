@@ -31,7 +31,7 @@ npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "
 - No unused variables or arguments (prefix unused arguments with `_` to ignore them)
 - Always wrap if statements with brackets even when there is only one line
 - No inline comments
-- When importing multiple items from a module, each import should be on a separate line
+- When importing multiple items from a module, each import should be on a separate line and in alphabetical order
 - Lines should be 100 characters or less
 - Arrow function parentheses: omit when possible, except for block bodies (e.g., `x => x` but `x => { return x }`)
 - Empty lines: maximum 1 empty line between code, no empty lines at beginning of file, 1 empty line at end of file
