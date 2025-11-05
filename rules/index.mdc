@@ -23,14 +23,43 @@ npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "
 
 ## Linting
 
+### General JavaScript Rules
+
 - Trailing spaces not allowed
 - '||' should be placed at the beginning of the line  
 - Missing trailing comma
-- No unused variables
+- No unused variables or arguments (prefix unused arguments with `_` to ignore them)
 - Always wrap if statements with brackets even when there is only one line
 - No inline comments
 - When importing multiple items from a module, each import should be on a separate line
 - Lines should be 100 characters or less
+- Arrow function parentheses: omit when possible, except for block bodies (e.g., `x => x` but `x => { return x }`)
+- Empty lines: maximum 1 empty line between code, no empty lines at beginning of file, 1 empty line at end of file
+- Restricted globals: use `utils/http.js` methods instead of `fetch`, use `utils/storage.js` methods instead of `sessionStorage`
+- Restricted imports: cannot import `lodash*` or `moment*` packages (use date-fns instead of moment)
+
+### Vue-Specific Rules
+
+- v-bind style: must use longform `:prop="value"` syntax
+- v-on style: must use longform `@event="handler"` syntax
+- v-slot style: must use longform `v-slot:name` syntax for all slots (default, named, and at-component)
+- HTML self-closing tags:
+  - Void elements: always self-closing (`<br />`, `<img />`)
+  - Normal HTML elements: never self-closing (`<div></div>`)
+  - Components: always self-closing (`<MyComponent />`)
+  - SVG and math elements: always self-closing
+- Script indentation: 2 spaces in `<script>` tags
+- Component name property: all Vue components must have a `name` property
+- Component definition name casing: component names must be PascalCase
+- v-for template key: `v-for` keys must be on the child element, not on the `<template>` tag
+- Undefined components: components must be defined (errors on undefined components, except `router-link` and `router-view`)
+- Vue compiler macros: cannot import `defineEmits` or `defineProps` from Vue (they are compiler macros and don't need to be imported)
+
+### EditorConfig Rules
+
+- Line endings: use LF (Unix-style) line endings
+- Indentation: 2 spaces for indentation
+- Final newline: files must end with a newline character
 
 ## EN files
 - Never use hardcoded strings directly in Vue templates
