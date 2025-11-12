@@ -1,0 +1,231 @@
+---
+alwaysApply: true
+description: Booking Requests - Business Information and User Guide
+---
+
+# Booking Requests - Business Information
+
+## Overview
+
+**Booking Requests** are requests for support worker services that clients or providers create. A booking request becomes a **booking** once a support worker accepts it. Booking requests allow clients/providers to specify:
+- Location (home, community, remote, or combination)
+- Date and time
+- Support worker(s) to send the request to
+- Description and requirements
+- Vehicle requirements
+- Support categories
+- Repeat frequency (for recurring requests)
+
+## User Types & Access
+
+### Who Can Create/Edit Booking Requests
+
+1. **Attendant Care Client** (`isAttendantCareClient`)
+   - Can create, edit, duplicate booking requests
+   - Requires feature flag: `clientTrialBookingRequests` (for creation)
+   - Can access retrospective booking creation
+
+2. **Provider** (`isProvider`)
+   - Can create, edit, duplicate booking requests
+   - Can create retrospective bookings
+   - Can send requests to multiple support workers (team requests) or a single worker (direct requests)
+
+3. **Support Coordinator** (`isSupportCoordinator`)
+   - Can create booking requests on behalf of clients
+   - Must select a client first before creating the request
+   - Can access accounts dashboard
+
+### Who Can View Booking Requests
+
+1. **Client** - Views their own booking requests
+   - URL pattern: `/booking-requests/client/{bookingRequestId}`
+   - Can see booking request details, edit, duplicate, or cancel
+
+2. **Support Worker** - Views booking requests sent to them
+   - URL pattern: `/booking-requests/support-worker/{bookingRequestId}`
+   - Can accept or decline booking requests
+   - Sees notices and compliance requirements
+
+3. **Provider** - Views booking requests they created
+   - URL pattern: `/booking-requests/{bookingRequestId}`
+
+## Accessing Booking Request Pages
+
+### Creating Booking Requests
+
+#### Attendant Care Client - Create Flow (V2)
+**Base URL:** `/booking-requests/create/attendant-care/`
+**Steps:**
+1. Location step: `/booking-requests/create/attendant-care/location`
+2. Date and Time step: `/booking-requests/create/attendant-care/date-and-time`
+3. Details step: `/booking-requests/create/attendant-care/details`
+4. Select Workers step: `/booking-requests/create/attendant-care/select-workers`
+
+**Direct Request (single worker):**
+- Add query param: `?supportWorkerId={workerId}`
+- Example: `/booking-requests/create/attendant-care/location?supportWorkerId=12345`
+
+**Team Request (multiple workers):**
+- No query param needed
+- Goes through select-workers step
+
+#### Provider - Create Flow (V2)
+**Base URL:** `/booking-requests/create/provider/`
+**Steps:** Same as attendant care client flow
+- Location: `/booking-requests/create/provider/location`
+- Date and Time: `/booking-requests/create/provider/date-and-time`
+- Details: `/booking-requests/create/provider/details`
+- Select Workers: `/booking-requests/create/provider/select-workers`
+
+#### Support Coordinator - Create Flow
+**Base URL:** `/booking-requests/create/support-coordinator/`
+**Steps:**
+1. Select Client step: `/booking-requests/create/support-coordinator/select-client`
+2. Location step: `/booking-requests/create/support-coordinator/location`
+3. Date and Time step: `/booking-requests/create/support-coordinator/date-and-time`
+4. Details step: `/booking-requests/create/support-coordinator/details`
+5. Select Workers step: `/booking-requests/create/support-coordinator/select-workers`
+
+### Editing Booking Requests
+
+**Base URL:** `/booking-requests/edit/{flowType}/{bookingRequestId}/`
+
+**Attendant Care Client:**
+- `/booking-requests/edit/attendant-care/{bookingRequestId}/location`
+- `/booking-requests/edit/attendant-care/{bookingRequestId}/date-and-time`
+- `/booking-requests/edit/attendant-care/{bookingRequestId}/details`
+- `/booking-requests/edit/attendant-care/{bookingRequestId}/select-workers`
+
+**Provider:**
+- `/booking-requests/edit/provider/{bookingRequestId}/location`
+- `/booking-requests/edit/provider/{bookingRequestId}/date-and-time`
+- `/booking-requests/edit/provider/{bookingRequestId}/details`
+- `/booking-requests/edit/provider/{bookingRequestId}/select-workers`
+
+**Note:** Users can only edit booking requests they created. Editing redirects to the first incomplete step if previous steps weren't completed.
+
+### Duplicating Booking Requests
+
+**Base URL:** `/booking-requests/duplicate/{flowType}/{bookingRequestId}/`
+
+Same step structure as edit flow:
+- `/booking-requests/duplicate/attendant-care/{bookingRequestId}/location`
+- `/booking-requests/duplicate/provider/{bookingRequestId}/location`
+- etc.
+
+**Note:** Duplicating creates a new booking request with the same details, allowing users to quickly create similar requests.
+
+### Viewing Booking Request Details
+
+**Client View:**
+- `/booking-requests/client/{bookingRequestId}`
+- Shows: booking details, support workers, status, action buttons (edit, duplicate, cancel)
+- Shows `EditBookingRequestNotice` if all workers have declined
+
+**Support Worker View:**
+- `/booking-requests/support-worker/{bookingRequestId}`
+- Shows: booking details, client information, accept/decline buttons
+- Shows `BookingRequestDetailsNotice` for various states (compliance, availability, etc.)
+
+**Provider View:**
+- `/booking-requests/{bookingRequestId}`
+- Shows: booking details, support workers, status
+
+### Retrospective Booking Creation
+
+**Attendant Care Client:**
+- `/booking-requests/create/retrospective/attendant-care/details`
+- Used for creating bookings that already happened (backdating)
+
+**Provider:**
+- `/booking-requests/create/retrospective/provider/details`
+- Used for creating bookings that already happened (backdating)
+
+## Business Workflows
+
+### Creating a New Booking Request
+
+1. **User navigates to create flow** (location step)
+2. **Location Step:** User selects location type (home, community, remote, combination) and enters address
+3. **Date and Time Step:** User selects date, start time, end time, and optionally repeat frequency
+4. **Details Step:** User enters description, vehicle requirements, support categories
+5. **Select Workers Step:** User selects one or more support workers (or skipped if direct request)
+6. **Submit:** Booking request is created and sent to selected workers
+
+### Editing a Booking Request
+
+1. **User navigates to booking request details**
+2. **Clicks "Edit" button**
+3. **Redirected to first step** (location) - can only edit if previous steps completed
+4. **User modifies information** across steps
+5. **Submit:** Booking request is updated
+
+**Important:** If a user tries to access a later step without completing previous steps, they are redirected to the first incomplete step.
+
+### Duplicating a Booking Request
+
+1. **User navigates to booking request details**
+2. **Clicks "Duplicate" button**
+3. **Redirected to create flow** with pre-filled information from original request
+4. **User can modify** any details before submitting
+5. **Submit:** New booking request is created
+
+### Support Worker Accepting/Declining
+
+1. **Support worker receives booking request** (via notification or viewing their requests)
+2. **Views booking request details** (`/booking-requests/support-worker/{id}`)
+3. **Sees notices** if there are compliance requirements or availability issues
+4. **Clicks "Accept" or "Decline"**
+5. **If accepted:** Booking request becomes a booking
+6. **If all workers decline:** Client sees `EditBookingRequestNotice` suggesting to edit or post job
+
+## Key Components
+
+### BookingRequestDetailsNotice
+- **Used by:** Support workers (primary), clients, providers
+- **Purpose:** Displays notices/alerts on booking request details pages
+- **Features:** Responsive action buttons (full width on mobile, auto width on desktop 960px+)
+- **Location:** `web-apps/src/booking-requests/components/BookingRequestDetailsNotice/`
+
+### EditBookingRequestNotice
+- **Used by:** Clients
+- **Purpose:** Shown when all support workers have declined a booking request
+- **Features:** Yellow warning stripe, "Edit" and "Post Job" buttons
+- **Location:** `web-apps/src/booking-requests/components/EditBookingRequestNotice/`
+
+### StepLayout
+- **Used by:** All create/edit/duplicate flows
+- **Purpose:** Provides consistent layout for multi-step forms
+- **Features:** Back button with hover/focus states, sidebar, footer
+- **Location:** `web-apps/src/booking-requests/components/StepLayout/`
+
+## Flow Types
+
+- **ATTENDANT_CARE_CLIENT:** `attendant-care-client`
+- **PROVIDER:** `provider`
+- **SUPPORT_COORDINATOR:** `support-coordinator`
+
+## Request Types
+
+- **Direct Request:** Sent to a single pre-selected support worker (uses `?supportWorkerId={id}` query param)
+- **Team Request:** Sent to multiple support workers (user selects workers in select-workers step)
+
+## Important Notes
+
+1. **Route Guards:** All booking request routes require authentication and appropriate user type guards
+2. **Step Completion:** Users cannot skip steps - must complete in order (location → date-and-time → details → select-workers)
+3. **Feature Flags:** Some flows are controlled by feature flags (e.g., `newBookingRequestFlowForAttendantCareClient`)
+4. **Retrospective Bookings:** Simplified flow (starts at details step) for creating past bookings
+5. **Booking vs Booking Request:** A booking request becomes a booking once accepted by a support worker
+
+## Testing Access
+
+To test booking request flows, you need:
+- Valid user credentials for the appropriate user type
+- Booking request IDs (for viewing/editing/duplicating)
+- Support worker IDs (for direct requests)
+
+**Example Test URLs:**
+- Create: `http://app.local.hireup.com.au/booking-requests/create/attendant-care/location`
+- View: `http://app.local.hireup.com.au/booking-requests/client/{bookingRequestId}`
+- Edit: `http://app.local.hireup.com.au/booking-requests/edit/attendant-care/{bookingRequestId}/location`
