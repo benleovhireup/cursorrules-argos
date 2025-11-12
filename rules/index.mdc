@@ -55,6 +55,10 @@ npx jest src/booking-requests/stores/flowV2/dateAndTime/dateAndTime.spec.js -t "
 - Undefined components: components must be defined (errors on undefined components, except `router-link` and `router-view`)
 - Vue compiler macros: cannot import `defineEmits` or `defineProps` from Vue (they are compiler macros and don't need to be imported)
 
+### Styling Rules
+
+- All new CSS in `.vue` files or in new `styles.js` files must be done in Tailwind, not hucssley
+
 ### EditorConfig Rules
 
 - Line endings: use LF (Unix-style) line endings
