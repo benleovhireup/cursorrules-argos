@@ -51,9 +51,26 @@ description: Booking Requests - Business Information and User Guide
 
 ## Accessing Booking Request Pages
 
+### Flow Versions
+
+**flowV2 (Current/Active):**
+- Modern flow with 4 steps: Location → Date and Time → Details → Select Workers
+- Supports repeat frequency and repeat end dates
+- Used for all new booking request creation
+- Store location: `web-apps/src/booking-requests/stores/flowV2/`
+- Views location: `web-apps/src/booking-requests/views/viewsV2/`
+
+**oneToMany (Deprecated/Legacy):**
+- Legacy flow with 3 steps: Location → Details → Select Workers (no date-and-time step)
+- Does NOT support repeat frequency
+- Still in use for some existing flows (being phased out)
+- Store location: `web-apps/src/booking-requests/stores/flows/oneToMany/`
+- Views location: `web-apps/src/booking-requests/views/BookingRequestContainer/flows/oneToMany/`
+- **Note:** This flow is deprecated and will be removed in the future
+
 ### Creating Booking Requests
 
-#### Attendant Care Client - Create Flow (V2)
+#### Attendant Care Client - Create Flow (flowV2 - Current)
 **Base URL:** `/booking-requests/create/attendant-care/`
 **Steps:**
 1. Location step: `/booking-requests/create/attendant-care/location`
@@ -69,13 +86,33 @@ description: Booking Requests - Business Information and User Guide
 - No query param needed
 - Goes through select-workers step
 
-#### Provider - Create Flow (V2)
+**Feature Flag:** Controlled by `newBookingRequestFlowForAttendantCareClient` (V2 flows not in production yet for attendant care clients)
+
+#### Attendant Care Client - Create Flow (oneToMany - Deprecated)
+**Base URL:** `/booking-requests/create/attendant-care/multiple-workers/`
+**Steps:**
+1. Location step: `/booking-requests/create/attendant-care/multiple-workers/location`
+2. Details step: `/booking-requests/create/attendant-care/multiple-workers/details`
+3. Select Workers step: `/booking-requests/create/attendant-care/multiple-workers/select-workers`
+
+**Note:** This flow does NOT have a date-and-time step. Date/time is entered in the details step.
+
+#### Provider - Create Flow (flowV2 - Current)
 **Base URL:** `/booking-requests/create/provider/`
-**Steps:** Same as attendant care client flow
+**Steps:** Same as attendant care client flowV2
 - Location: `/booking-requests/create/provider/location`
 - Date and Time: `/booking-requests/create/provider/date-and-time`
 - Details: `/booking-requests/create/provider/details`
 - Select Workers: `/booking-requests/create/provider/select-workers`
+
+#### Provider - Create Flow (oneToMany - Deprecated)
+**Base URL:** `/booking-requests/create/provider/multiple-workers/`
+**Steps:**
+1. Location step: `/booking-requests/create/provider/multiple-workers/location`
+2. Details step: `/booking-requests/create/provider/multiple-workers/details`
+3. Select Workers step: `/booking-requests/create/provider/multiple-workers/select-workers`
+
+**Note:** This flow does NOT have a date-and-time step. Date/time is entered in the details step.
 
 #### Support Coordinator - Create Flow
 **Base URL:** `/booking-requests/create/support-coordinator/`
@@ -88,21 +125,37 @@ description: Booking Requests - Business Information and User Guide
 
 ### Editing Booking Requests
 
+#### flowV2 Edit Flow (Current)
+
 **Base URL:** `/booking-requests/edit/{flowType}/{bookingRequestId}/`
 
-**Attendant Care Client:**
+**Attendant Care Client (flowV2):**
 - `/booking-requests/edit/attendant-care/{bookingRequestId}/location`
 - `/booking-requests/edit/attendant-care/{bookingRequestId}/date-and-time`
 - `/booking-requests/edit/attendant-care/{bookingRequestId}/details`
 - `/booking-requests/edit/attendant-care/{bookingRequestId}/select-workers`
 
-**Provider:**
+**Provider (flowV2):**
 - `/booking-requests/edit/provider/{bookingRequestId}/location`
 - `/booking-requests/edit/provider/{bookingRequestId}/date-and-time`
 - `/booking-requests/edit/provider/{bookingRequestId}/details`
 - `/booking-requests/edit/provider/{bookingRequestId}/select-workers`
 
-**Note:** Users can only edit booking requests they created. Editing redirects to the first incomplete step if previous steps weren't completed.
+#### oneToMany Edit Flow (Deprecated)
+
+**Base URL:** `/booking-requests/edit/{flowType}/multiple-workers/{bookingRequestId}/`
+
+**Attendant Care Client (oneToMany):**
+- `/booking-requests/edit/attendant-care/multiple-workers/{bookingRequestId}/location`
+- `/booking-requests/edit/attendant-care/multiple-workers/{bookingRequestId}/details`
+- `/booking-requests/edit/attendant-care/multiple-workers/{bookingRequestId}/select-workers`
+
+**Provider (oneToMany):**
+- `/booking-requests/edit/provider/multiple-workers/{bookingRequestId}/location`
+- `/booking-requests/edit/provider/multiple-workers/{bookingRequestId}/details`
+- `/booking-requests/edit/provider/multiple-workers/{bookingRequestId}/select-workers`
+
+**Note:** Users can only edit booking requests they created. Editing redirects to the first incomplete step if previous steps weren't completed. The flow version (V2 vs oneToMany) is determined by how the booking request was originally created.
 
 ### Duplicating Booking Requests
 
@@ -143,14 +196,24 @@ Same step structure as edit flow:
 
 ## Business Workflows
 
-### Creating a New Booking Request
+### Creating a New Booking Request (flowV2)
 
 1. **User navigates to create flow** (location step)
 2. **Location Step:** User selects location type (home, community, remote, combination) and enters address
-3. **Date and Time Step:** User selects date, start time, end time, and optionally repeat frequency
+3. **Date and Time Step:** User selects date, start time, end time, and optionally repeat frequency with end date
 4. **Details Step:** User enters description, vehicle requirements, support categories
 5. **Select Workers Step:** User selects one or more support workers (or skipped if direct request)
 6. **Submit:** Booking request is created and sent to selected workers
+
+### Creating a New Booking Request (oneToMany - Deprecated)
+
+1. **User navigates to create flow** (location step)
+2. **Location Step:** User selects location type (home, community, remote, combination) and enters address
+3. **Details Step:** User enters date, start time, end time, description, vehicle requirements, support categories (date/time combined with details)
+4. **Select Workers Step:** User selects one or more support workers
+5. **Submit:** Booking request is created and sent to selected workers
+
+**Key Difference:** oneToMany flow combines date/time entry with the details step, while flowV2 has a separate date-and-time step and supports repeat frequency.
 
 ### Editing a Booking Request
 
