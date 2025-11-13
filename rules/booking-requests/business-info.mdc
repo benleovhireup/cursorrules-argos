@@ -256,30 +256,27 @@ Same step structure as edit flow:
 
 1. **Support worker receives booking request** (via notification or viewing their requests)
 2. **Views booking request details** (`/booking-requests/support-worker/{id}`)
-3. **Sees notices** if there are compliance requirements or availability issues
-4. **Clicks "Accept" or "Decline"**
-5. **If accepted:** Booking request becomes a booking
-6. **If all workers decline:** Client sees `EditBookingRequestNotice` suggesting to edit or post job
-
-## Key Components
-
-### BookingRequestDetailsNotice
-- **Used by:** Support workers (primary), clients, providers
-- **Purpose:** Displays notices/alerts on booking request details pages
-- **Features:** Responsive action buttons (full width on mobile, auto width on desktop 960px+)
-- **Location:** `web-apps/src/booking-requests/components/BookingRequestDetailsNotice/`
-
-### EditBookingRequestNotice
-- **Used by:** Clients
-- **Purpose:** Shown when all support workers have declined a booking request
-- **Features:** Yellow warning stripe, "Edit" and "Post Job" buttons
-- **Location:** `web-apps/src/booking-requests/components/EditBookingRequestNotice/`
-
-### StepLayout
-- **Used by:** All create/edit/duplicate flows
-- **Purpose:** Provides consistent layout for multi-step forms
-- **Features:** Back button with hover/focus states, sidebar, footer
-- **Location:** `web-apps/src/booking-requests/components/StepLayout/`
+3. **System checks compliance and agreements:**
+   - Checks if support worker has pending compliance requirements
+   - Checks if IFA (Individual Flexibility Agreement) needs to be accepted
+   - Checks if Provider Employment Agreement needs to be accepted (for provider workers)
+   - Checks worker availability for the booking request
+   - Shows notices/alerts if there are any issues
+4. **If agreements required:** Support worker sees "Sign agreement" button and is redirected to appropriate agreement page (`/agreements/ifa` or `/agreements/provider-employment-agreement`)
+5. **After agreements accepted:** Support worker returns to dashboard and can now accept the booking request
+6. **Support worker clicks "Accept" or "Decline":**
+   - **Accept:** 
+     - API call: `POST /api/v1.5/booking-requests/{bookingRequestId}/accept?supportWorkerId={supportWorkerId}`
+     - Booking request becomes a booking
+     - Support worker redirected to confirmed bookings list
+     - Success message shown: "Booking confirmed with {clientName}"
+     - Error shown if request has already passed: "This request has already passed"
+   - **Decline:**
+     - API call: `POST /api/v1.5/booking-requests/{bookingRequestId}/decline?supportWorkerId={supportWorkerId}`
+     - Support worker redirected to booking requests list
+     - Error shown if decline fails: "Booking request could not be declined"
+7. **If all workers decline:** Client sees `EditBookingRequestNotice` suggesting to edit or post job
+8. **If booking expired:** Support worker cannot accept expired booking requests (for team requests)
 
 ## Flow Types
 
