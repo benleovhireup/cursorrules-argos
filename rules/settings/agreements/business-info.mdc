@@ -1,0 +1,222 @@
+---
+alwaysApply: true
+description: Settings / Agreements - Business Information and User Guide
+---
+
+# Settings / Agreements - Business Information
+
+## Overview
+
+**Agreements** are legal documents that users must accept to use the Hireup platform. Agreements track acceptance status, date, and version. Once accepted, agreements are immutable and cannot be updated. 
+
+The **Settings / Agreements** section displays all signed agreements for a user in their settings page. This is part of the settings vertical and is read-only (agreements cannot be accepted or modified from this view).
+
+Agreements track:
+- Acceptance status (`accepted` boolean)
+- Acceptance date (`acceptedAt`, `date`, or `createdAt`)
+- Version (`version` number)
+- Agreement type (`agreementType` string)
+
+## Agreement Types
+
+1. **`covid19`** - Covid safety standards agreement
+2. **`ifa`** - IFA (Individual Flexibility Agreement)
+3. **`provider-employment-agreement`** - Provider employment agreement
+4. **`SERVICE`** - Service agreement
+5. **`TC_PRIVACY`** - Terms and conditions / Privacy agreement
+6. **`CONTRACT`** - Employment agreement
+
+## User Types & Access
+
+### Who Can View Agreements in Settings
+
+1. **Admin** (`isLoggedInAsAdmin`)
+   - Can view agreements for any user
+   - Can view agreements for account managers and support coordinators associated with users
+   - URL pattern: `/admin/settings/{userId}` (navigate to "Agreements" section)
+   - Uses admin API endpoint: `/api/v1.5/admin/agreements?userId={userId}`
+
+2. **Support Coordinator** (`isSupportCoordinator`)
+   - Can view their own agreements
+   - Can view agreements for clients they support
+   - URL pattern: `/settings/{userId}` or `/settings/support-coordinator/{userId}` (navigate to "Agreements" section)
+
+3. **Support Worker** (`isSupportWorker`)
+   - Can view their own agreements
+   - URL pattern: `/settings/{userId}` (navigate to "Agreements" section)
+
+4. **Client** (`isClient`)
+   - Can view their own agreements
+   - URL pattern: `/settings/{userId}` (navigate to "Agreements" section)
+
+5. **Provider** (`isProvider`)
+   - Can view their own agreements
+   - URL pattern: `/settings/{userId}` (navigate to "Agreements" section)
+
+## Accessing Settings / Agreements
+
+### Settings Page Structure
+
+**Base URLs:**
+- Regular settings: `/settings/{userId}`
+- Admin settings: `/admin/settings/{userId}`
+- Support coordinator settings: `/settings/support-coordinator/{userId}`
+
+**Navigation:**
+1. Navigate to settings page for a user
+2. Go to "Account" section (or appropriate section based on user type)
+3. Click on "Agreements" section
+4. Agreements are displayed in read-only format
+
+**Settings Schema Location:**
+- Client: `web-apps/src/settings/schemas/client.js` (includes `agreements` in Account section)
+- Worker: `web-apps/src/settings/schemas/worker.js` (includes `agreements` in Account section)
+- Provider: `web-apps/src/settings/schemas/provider.js` (includes `agreements` in Account section)
+- Manager: `web-apps/src/settings/schemas/manager.js` (includes `agreements` in Account section)
+- Coordinator Client: `web-apps/src/settings/schemas/coordinatorClient.js` (includes `agreements` in Account section)
+
+**Schema Definition:** `web-apps/src/settings/schemas/common/agreements.js`
+
+**Component Location:** `web-apps/src/admin/settings/components/AgreementsCard/`
+
+### What is Displayed
+
+The Settings / Agreements section shows:
+- All signed agreements for the user
+- Agreement type (e.g., "IFA", "Service", "Terms and conditions")
+- Version number (for admins or non-service agreements)
+- Acceptance date (formatted as `dd/MM/yyyy`)
+- Links to agreement documents (for service agreements and agreements with `documentUrl`)
+- Grouped by client type (for admin view: others, accountManager, supportCoordinator)
+
+**Note:** This is a read-only view. Agreements cannot be accepted or modified from the settings page. To accept agreements, users must use:
+- Dashboard widgets (for support workers)
+- Dedicated agreement pages (`/agreements/{type}`)
+
+## API Endpoints for Settings / Agreements
+
+### GET Endpoints (Fetch Agreements for Settings)
+
+1. **Get all agreements for a user (regular view):**
+   - URL: `/api/v1.5/agreements?userId={userId}`
+   - Method: GET
+   - Returns: List of agreements for the specified user
+   - Used by: Settings page (non-admin), support coordinators
+   - **API File:** `web-apps/src/admin/settings/components/AgreementsCard/api.js`
+
+2. **Get agreements (admin view):**
+   - URL: `/api/v1.5/admin/agreements?userId={userId}`
+   - Method: GET
+   - Returns: `{ agreements: [...] }`
+   - Used by: Admin settings page
+   - **API File:** `web-apps/src/admin/settings/components/AgreementsCard/api.js`
+
+**Note:** Settings / Agreements is read-only. There are no POST/PUT/PATCH endpoints for updating agreements from settings. Agreements are accepted through other flows (dashboard widgets, dedicated agreement pages).
+
+## Business Workflows
+
+### Viewing Agreements in Settings
+
+1. **User navigates to settings page** (`/settings/{userId}` or `/admin/settings/{userId}`)
+2. **User navigates to "Account" section** (or appropriate section based on user type)
+3. **User clicks on "Agreements" section**
+4. **Agreements section loads** - fetches agreements via API (`GET /api/v1.5/agreements?userId={userId}` or admin endpoint)
+5. **Agreements displayed** - shows signed agreements with:
+   - Agreement type (e.g., "IFA", "Service", "Terms and conditions")
+   - Version number (if available and user is admin or agreement is not SERVICE type)
+   - Acceptance date (formatted as `dd/MM/yyyy`)
+   - Links to agreement documents (for service agreements and agreements with `documentUrl`)
+6. **Admin view** - shows agreements grouped by client type (others, accountManager, supportCoordinator)
+7. **Service agreements** - link to external document pages (`{HIREUP_URL}service-agreement-documents/`)
+
+**Important:** This is a read-only view. Users cannot accept or modify agreements from the settings page.
+
+## Key Components
+
+### AgreementsCard
+- **Used by:** Settings pages (admin and regular)
+- **Purpose:** Displays all agreements for a user in settings
+- **Features:** 
+  - Shows agreements grouped by client type (others, accountManager, supportCoordinator)
+  - Handles loading states and error states
+  - Fetches agreements via API based on user type (admin vs regular)
+- **Location:** `web-apps/src/admin/settings/components/AgreementsCard/`
+- **API:** `web-apps/src/admin/settings/components/AgreementsCard/api.js`
+
+### AgreementList
+- **Used by:** AgreementsCard
+- **Purpose:** Displays a list of agreements for a specific client type
+- **Features:** 
+  - Shows section title (e.g., "Agreements", "Account Manager agreements", "Support Coordinator agreements")
+  - Displays disclaimer for service agreements (admin view only)
+  - Renders list of agreement items
+- **Location:** `web-apps/src/admin/settings/components/AgreementsCard/AgreementList/`
+
+### AgreementItem
+- **Used by:** AgreementList
+- **Purpose:** Displays a single agreement with type, version, and date
+- **Features:** 
+  - Shows agreement type name (from EN.json)
+  - Links to agreement documents (for service agreements and agreements with `documentUrl`)
+  - Displays version number (for admins or non-service agreements)
+  - Shows acceptance date (formatted as `dd/MM/yyyy`)
+- **Location:** `web-apps/src/admin/settings/components/AgreementsCard/AgreementItem/`
+
+### SettingsSection
+- **Used by:** Settings page
+- **Purpose:** Renders different settings sections, including agreements
+- **Features:** 
+  - Checks if section ID is `'agreements'` and renders `AgreementsCard`
+  - Handles other settings sections
+- **Location:** `web-apps/src/settings/components/SettingsSection/Index.vue`
+
+## Important Notes
+
+1. **Settings / Agreements is read-only** - This section only displays agreements, it does not allow accepting or modifying them
+2. **Agreements are immutable** - Once accepted, agreements cannot be updated or modified
+3. **Service agreements** - Link to external pages (`{HIREUP_URL}service-agreement-documents/`)
+4. **Admin view** - Shows agreements for account managers and support coordinators separately
+5. **Version display** - Version numbers are shown for admins or non-service agreements only
+6. **Date formatting** - Acceptance dates are formatted as `dd/MM/yyyy` using date-fns
+7. **Empty state** - If no agreements exist, the section may be empty or show a message
+
+## API Implementation
+
+**Settings API File:** `web-apps/src/admin/settings/components/AgreementsCard/api.js`
+
+**Key Functions:**
+- `getAgreements(userId, isAdmin)` - Gets all agreements for a user (admin or regular view)
+
+**Component Structure:**
+- `AgreementsCard` - Main component that fetches and displays agreements
+- `AgreementList` - Displays agreements grouped by client type
+- `AgreementItem` - Displays individual agreement details
+
+**Settings Schema:** `web-apps/src/settings/schemas/common/agreements.js`
+
+## Testing Access
+
+To test Settings / Agreements functionality, you need:
+- Valid user credentials for the appropriate user type
+- User IDs for testing settings pages
+
+**Example Test URLs:**
+- View agreements (regular): `http://app.local.hireup.com.au/settings/{userId}` (navigate to Account → Agreements section)
+- View agreements (admin): `http://app.local.hireup.com.au/admin/settings/{userId}` (navigate to Account → Agreements section)
+- View agreements (support coordinator): `http://app.local.hireup.com.au/settings/support-coordinator/{userId}` (navigate to Account → Agreements section)
+
+**Test Users:**
+- Support workers: Use accounts with `type: 2` (support worker)
+- Admins: Use accounts with admin permissions (`isLoggedInAsAdmin`)
+- Clients: Use accounts with `type: 1` (client)
+- Providers: Use accounts with `type: 3` (provider)
+- Support coordinators: Use accounts with `isSupportCoordinator` permission
+
+**Testing Steps:**
+1. Log in as the appropriate user type
+2. Navigate to settings page (`/settings/{userId}` or `/admin/settings/{userId}`)
+3. Navigate to "Account" section
+4. Click on "Agreements" section
+5. Verify agreements are displayed correctly with type, version (if applicable), and date
+6. Verify links to external documents work (for service agreements)
+7. For admin view, verify agreements are grouped by client type (others, accountManager, supportCoordinator)
