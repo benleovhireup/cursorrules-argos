@@ -1,0 +1,238 @@
+---
+alwaysApply: true
+description: Agreements Routes - Business Information and User Guide
+---
+
+# Agreements Routes - Business Information
+
+## Overview
+
+The **Agreements** vertical (`/agreements`) provides dedicated pages for support workers to read and accept specific agreements. These routes are separate from the settings vertical and are used for accepting agreements, not viewing them.
+
+**Base Path:** `/agreements` (configured via `AGREEMENTS_ENTRYPOINT` in config)
+
+**Location:** `web-apps/src/agreements/`
+
+## Agreement Routes
+
+### IFA Agreement
+
+**URL:** `/agreements/ifa`
+
+**Query Parameters:**
+- `redirectUrl` (optional) - URL to redirect to after accepting. Defaults to dashboard (`/`)
+
+**Example:** `/agreements/ifa?redirectUrl=/dashboard`
+
+**Guard:** `isSupportWorkerGuard` - Only support workers can access this route
+
+**Component:** `web-apps/src/agreements/views/Ifa/Index.vue`
+
+**Purpose:** Allows support workers to read and accept the IFA (Individual Flexibility Agreement)
+
+### Provider Employment Agreement
+
+**URL:** `/agreements/provider-employment-agreement`
+
+**Query Parameters:**
+- `redirectUrl` (optional) - URL to redirect to after accepting. Defaults to dashboard (`/`)
+
+**Example:** `/agreements/provider-employment-agreement?redirectUrl=/dashboard`
+
+**Guard:** `isSupportWorkerGuard` - Only support workers can access this route
+
+**Component:** `web-apps/src/agreements/views/ProviderEmploymentAgreement/Index.vue`
+
+**Purpose:** Allows support workers who work with providers to read and accept the Provider Employment Agreement
+
+## User Types & Access
+
+### Who Can Access Agreement Routes
+
+1. **Support Worker** (`isSupportWorker`)
+   - Can access both `/agreements/ifa` and `/agreements/provider-employment-agreement`
+   - Required to accept agreements before accepting bookings
+   - Routes are protected by `isSupportWorkerGuard`
+
+**Note:** These routes are NOT accessible to admins, clients, or providers for viewing. They are specifically for support workers to accept agreements.
+
+## API Endpoints
+
+### GET Endpoints
+
+1. **Get IFA agreement status:**
+   - URL: `/api/v1.5/agreements/ifa`
+   - Method: GET
+   - Returns: `{ accepted: boolean, acceptedAt: string, version: string }`
+   - **Note:** Returns 404 if agreement not yet accepted (treated as `accepted: false`)
+   - **API File:** `web-apps/src/api/core/agreements.js`
+
+2. **Get provider employment agreement status:**
+   - URL: `/api/v1.5/agreements/provider-employment-agreement`
+   - Method: GET
+   - Returns: `{ accepted: boolean, acceptedAt: string, version: string }`
+   - **API File:** `web-apps/src/api/core/agreements.js`
+
+3. **Get provider employment agreement content:**
+   - URL: `/api/v1.5/agreements/provider-employment-agreement/content`
+   - Method: GET
+   - Returns: Agreement content/document (HTML content, title, version)
+   - Used by: Provider employment agreement page
+   - **API File:** `web-apps/src/agreements/views/ProviderEmploymentAgreement/api.js`
+
+### POST Endpoints (Accept Agreements)
+
+1. **Accept IFA agreement:**
+   - URL: `/api/v1.5/agreements/ifa`
+   - Method: POST
+   - Body: Optional `{ version: string }` for versioned agreements
+   - **API File:** `web-apps/src/api/core/agreements.js`
+
+2. **Accept provider employment agreement:**
+   - URL: `/api/v1.5/agreements/provider-employment-agreement`
+   - Method: POST
+   - Body: `{ version: string }` (required)
+   - **API File:** `web-apps/src/api/core/agreements.js`
+
+## Business Workflows
+
+### Accepting IFA Agreement
+
+1. **User navigates to IFA page** (`/agreements/ifa` or with `redirectUrl` query param)
+2. **Page loads** - checks if agreement already accepted via `GET /api/v1.5/agreements/ifa`
+3. **If already accepted** - shows acknowledgment message with acceptance date
+4. **If not accepted** - displays agreement form with:
+   - Agreement content/text
+   - User's full name (personalized greeting)
+   - Accept checkbox/button
+5. **User reads and accepts** - checks acceptance checkbox and submits
+6. **POST request sent** - `POST /api/v1.5/agreements/ifa` with version (if applicable)
+7. **On success** - user redirected to `redirectUrl` query param or dashboard (`/`)
+
+### Accepting Provider Employment Agreement
+
+1. **User navigates to provider employment agreement page** (`/agreements/provider-employment-agreement` or with `redirectUrl` query param)
+2. **Page loads** - fetches agreement content via `GET /api/v1.5/agreements/provider-employment-agreement/content`
+3. **Checks if already accepted** - via `GET /api/v1.5/agreements/provider-employment-agreement`
+4. **If already accepted** - shows acknowledgment message with acceptance date
+5. **If not accepted** - displays agreement form with:
+   - Agreement content (fetched from API, sanitized HTML)
+   - Agreement title and version
+   - User's full name (personalized greeting)
+   - Accept checkbox/button
+6. **User reads and accepts** - checks acceptance checkbox and submits
+7. **POST request sent** - `POST /api/v1.5/agreements/provider-employment-agreement` with `{ version: string }`
+8. **On success** - user redirected to `redirectUrl` query param or dashboard (`/`)
+
+### Agreement Required for Booking Acceptance
+
+1. **Support worker views booking** - sees booking request on dashboard
+2. **System checks agreements** - verifies IFA or provider employment agreement accepted
+3. **If not accepted** - booking action shows "Sign agreement" button
+4. **User clicks button** - redirected to appropriate agreement page (`/agreements/ifa` or `/agreements/provider-employment-agreement`) with `redirectUrl` back to dashboard
+5. **After accepting** - user redirected back to dashboard and can now accept the booking
+
+## Key Components
+
+### Ifa (IFA Agreement Page)
+- **Route:** `/agreements/ifa`
+- **Purpose:** Displays IFA agreement for support workers to read and accept
+- **Features:**
+  - Shows personalized greeting with user's full name
+  - Displays agreement content
+  - Shows acknowledgment message if already accepted
+  - Handles form submission and redirect
+- **Location:** `web-apps/src/agreements/views/Ifa/Index.vue`
+- **Store:** Uses `web-apps/src/agreements/store/agreements.js` for state management
+
+### ProviderEmploymentAgreement (Provider Employment Agreement Page)
+- **Route:** `/agreements/provider-employment-agreement`
+- **Purpose:** Displays provider employment agreement for support workers to read and accept
+- **Features:**
+  - Fetches agreement content from API
+  - Shows personalized greeting with user's full name
+  - Displays agreement content (sanitized HTML)
+  - Shows agreement title and version
+  - Shows acknowledgment message if already accepted
+  - Handles form submission and redirect
+- **Location:** `web-apps/src/agreements/views/ProviderEmploymentAgreement/Index.vue`
+- **API:** `web-apps/src/agreements/views/ProviderEmploymentAgreement/api.js`
+- **Store:** Uses `web-apps/src/agreements/store/agreements.js` for state management
+
+### isSupportWorkerGuard
+- **Purpose:** Route guard that ensures only support workers can access agreement routes
+- **Location:** `web-apps/src/agreements/router/guard/isSupportWorkerGuard.js`
+- **Used by:** All agreement routes
+
+### Agreements Store
+- **Purpose:** Manages agreement state (acceptance status, dates, versions)
+- **Location:** `web-apps/src/agreements/store/agreements.js`
+- **Features:**
+  - Tracks IFA agreement status
+  - Tracks provider employment agreement status
+  - Handles API events and updates state
+  - Provides getters for checking acceptance status
+
+## Router Configuration
+
+**Router File:** `web-apps/src/agreements/router/index.js`
+
+**Routes File:** `web-apps/src/agreements/router/routes.js`
+
+**Base Path:** Configured via `config.AGREEMENTS_ENTRYPOINT` (default: `'agreements'`)
+
+**Authentication:** All routes require authentication (`isAuthenticatedGuard`)
+
+**Route Guards:** All routes require `isSupportWorkerGuard`
+
+## Important Notes
+
+1. **Support workers only** - These routes are exclusively for support workers to accept agreements
+2. **Redirect URLs** - Both routes support `redirectUrl` query param to redirect after acceptance
+3. **Already accepted** - If agreement already accepted, page shows acknowledgment message instead of form
+4. **Version required** - Provider employment agreement requires version in POST body
+5. **Booking blocking** - Support workers cannot accept bookings until required agreements are accepted
+6. **Agreement content** - Provider employment agreement content is fetched from API and sanitized before display
+7. **Personalized greeting** - Both pages show personalized greeting with user's full name
+8. **Immutable** - Once accepted, agreements cannot be updated or modified
+
+## API Implementation
+
+**Main API File:** `web-apps/src/api/core/agreements.js`
+
+**Key Functions:**
+- `getIsAccepted()` - Gets IFA agreement status
+- `postAccept(data)` - Accepts IFA agreement
+- `getHasProviderEmploymentAgreementAccepted()` - Gets provider employment agreement status
+- `postProviderEmploymentAgreement(data)` - Accepts provider employment agreement
+
+**Provider Employment Agreement API:** `web-apps/src/agreements/views/ProviderEmploymentAgreement/api.js`
+- `getProviderEmploymentAgreementData()` - Gets agreement content
+
+**Store:** `web-apps/src/agreements/store/agreements.js`
+- Manages agreement state
+- Subscribes to API events
+- Provides getters and actions
+
+## Testing Access
+
+To test agreement routes, you need:
+- Valid support worker account credentials
+- Support worker user ID
+
+**Example Test URLs:**
+- IFA agreement: `http://app.local.hireup.com.au/agreements/ifa?redirectUrl=/dashboard`
+- Provider employment: `http://app.local.hireup.com.au/agreements/provider-employment-agreement?redirectUrl=/dashboard`
+
+**Test Users:**
+- Support workers: Use accounts with `type: 2` (support worker)
+- Must have `isSupportWorker` permission
+
+**Testing Steps:**
+1. Log in as a support worker
+2. Navigate to agreement page (`/agreements/ifa` or `/agreements/provider-employment-agreement`)
+3. Verify agreement content is displayed
+4. If not accepted, verify form is shown with accept checkbox
+5. If already accepted, verify acknowledgment message is shown
+6. Accept agreement and verify redirect to `redirectUrl` or dashboard
+7. Verify agreement status is updated (check via settings or API)

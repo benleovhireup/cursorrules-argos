@@ -1,0 +1,8 @@
+---
+alwaysApply: false
+description: Agreements Routes - Index
+---
+
+# Agreements Routes
+
+See [business-info.mdc](./business-info.mdc) for detailed information about the `/agreements` routes.
